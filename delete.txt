@@ -1,0 +1,57 @@
+Pasos principales:
+
+1. Diseñar las clases y las interfaces en los .hpp.
+2. A: servidor + poll + buffers. B: clase Channel y comandos con un mock sencillo.
+3. Integración: A termina PASS/NICK/USER, B conecta JOIN y PRIVMSG. Probad con el cliente real.
+4. B termina los comandos de operador y los modos, y A pasa a robustecer: datos parciales, desconexiones bruscas, muchos clientes, valgrind.
+5. Final: README y simulacro de evaluación.
+
+Posible estructura:
+
+ft_irc/
+├── Makefile
+├── README.md
+├── .gitignore
+├── includes/
+│   ├── Server.hpp
+│   ├── Client.hpp
+│   ├── Channel.hpp
+│   └── Utils.hpp
+├── src/
+│   ├── main.cpp
+│   ├── Server.cpp
+│   ├── Client.cpp
+│   ├── Channel.cpp
+│   └── commands/
+│       ├── Pass.cpp
+│       ├── Nick.cpp
+│       ├── Join.cpp
+│       └── ...
+└── tests/
+
+Conceptos relevantes:
+-Socket: Un socket es un “enchufe” por el que dos programas se comunican por red. 
+Para el servidor, cada cliente conectado es un número (un file descriptor, fd) con el que se lee y se escribe, casi como un archivo.
+
+-Qué hace un servidor TCP. Siempre sigue estos pasos:
+socket() → bind() → listen() → accept() → recv() / send()
+
+-Existencia de poll: Si tenéis 5 clientes conectados, no sabéis cuál va a escribir primero. poll() le dice al sistema: “avísame cuando alguno de estos fds tenga algo que leer”. 
+Así un solo hilo atiende a todos sin bloquearse.
+
+-Protocolo IRC:
+Es texto plano. Cada comando es una línea terminada en \r\n:
+
+PASS contraseña
+NICK laura
+USER laura 0 * :Laura Gómez
+JOIN #canal
+PRIVMSG #canal :hola a todos
+
+Y el servidor responde con líneas parecidas, muchas con un número (001, 433, 461...)
+
+Algunos Recursos:
+
+Beej’s Guide to Network Programming: es la referencia para sockets en C. Está gratis en internet, y con los primeros capítulos y la parte de poll() es suficiente.
+Modern IRC Client Protocol (modern.ircdocs.horse): explica cada comando y cada respuesta numérica. Solo para consultar.
+RFC 1459 / RFC 2812: la especificación original. Densa; es solo para dudas.
