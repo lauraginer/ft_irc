@@ -52,12 +52,14 @@ header:
 	
 $(NAME): $(OBJS)
 	@echo "$(GREEN)🔗 Linking $(NAME)...$(RESET)"
-	@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+	@$(CPP) $(CPPFLAGS) $(OBJS) -o $(NAME)
 	@echo "$(GREEN)✅ $(NAME) created!$(RESET)"
 	
 $(OBJS_DIR)/%.o: %.cpp
-	@mkdir -p $(OBJS_DIR)
-	@$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
+	@mkdir -p $(@D)
+	@$(CPP) $(CPPFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+
+-include $(DEPS)
 
 clean:
 	@rm -rf $(OBJS_DIR)

@@ -2,7 +2,7 @@ Pasos principales:
 
 1. Diseñar las clases y las interfaces en los .hpp.
 2. A: servidor + poll + buffers. B: clase Channel y comandos con un mock sencillo.
-3. Integración: A termina PASS/NICK/USER, B conecta JOIN y PRIVMSG. Probad con el cliente real.
+3. Integración: A termina PASS/NICK/USER, B conecta JOIN y PRIVMSG. Probar con el cliente real.
 4. B termina los comandos de operador y los modos, y A pasa a robustecer: datos parciales, desconexiones bruscas, muchos clientes, valgrind.
 5. Final: README y simulacro de evaluación.
 
