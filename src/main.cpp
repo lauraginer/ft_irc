@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/04 20:04:21 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/08 21:26:57 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/11 19:36:09 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,14 @@
 #include <cctype>
 #include <cstdlib>
 #include <stdexcept>
+#include "MiniServer.hpp"
 
-void parse_arguments(std::string port, std::string password)
-{
+int parse_arguments(std::string port, std::string password)
+{	
 	if(port.empty() && password.empty())
 		throw std::runtime_error("wrong arguments. Usage: ./ircserver_bonus <port> <password>");
 	//validacion del puerto
+	int number;
 	if(port.empty() || port.size() > 5)
 		throw std::runtime_error("Port not valid. Enter a number between 1024 and 65535");
 	else
@@ -32,7 +34,7 @@ void parse_arguments(std::string port, std::string password)
 				throw std::runtime_error("Port not valid. Enter a number between 1024 and 65535");
 			i++;
 		}
-		int number = atoi(port.c_str());
+		number = atoi(port.c_str());
 		if(number < 1024 || number > 65535) //aceptar los ports que no esten reservados
 			throw std::runtime_error("Port not valid. Enter a number between 1024 and 65535");
 
@@ -40,6 +42,7 @@ void parse_arguments(std::string port, std::string password)
 	//validacion de la contraseña
 	if(password.empty() || (password.size() < 4) || password[0] == ' ' || password[password.size() - 1] == ' ')
 		throw std::runtime_error("Password incorrect");
+	return(number);
 }
 
 int main(int argc, char **argv)
@@ -48,8 +51,9 @@ int main(int argc, char **argv)
 	{
 		if(argc != 3)
 			throw std::runtime_error("wrong arguments. Usage: ./ircserver_bonus <port> <password>");
-		parse_arguments(argv[1], argv[2]); 
+		int port = parse_arguments(argv[1], argv[2]); 
 		
+		MiniServer server(port, argv[2]);
 		//las excepciones mejor solo para el parseo y algo minimo, no para el servidor
 	}
 	catch (const std::exception &e)

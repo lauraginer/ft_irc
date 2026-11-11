@@ -6,7 +6,7 @@
 #    By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/11/02 20:36:28 by lauragm           #+#    #+#              #
-#    Updated: 2026/11/02 21:03:46 by lauragm          ###   ########.fr        #
+#    Updated: 2026/11/11 19:31:17 by lauragm          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ CPPFLAGS := -Wall -Wextra -Werror -std=c++98 -g
 # Para depurar a mano, descomenta:
 # CPPFLAGS += -fsanitize=address,undefined
 
-INCLUDES := -Iincludes
+INCLUDES := -Iinclude
 OBJS_DIR := build
 
 SRCS := $(wildcard src/*.cpp src/commands/*.cpp) #temporal
