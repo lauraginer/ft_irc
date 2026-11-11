@@ -1,5 +1,16 @@
-#include "MiniServer.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   MiniServer.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/11/11 23:20:51 by lauragm           #+#    #+#             */
+/*   Updated: 2026/11/11 23:20:52 by lauragm          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "MiniServer.hpp"
 
 MiniServer::MiniServer(int pt, const std::string &pass): port(pt), password(pass), serverFd(-1)
 {
