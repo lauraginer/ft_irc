@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/11 23:20:59 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/11 23:21:02 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/15 17:27:22 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <cstring>
+#include <fcntl.h>
+#include <poll.h>
 
 class MiniServer{
 
@@ -26,6 +28,7 @@ class MiniServer{
 		int	port;
 		std::string password;
 		int serverFd;
+		std::vector<struct pollfd>	pollFds;
 
 	public:
 		MiniServer(int pt, const std::string &pass);
