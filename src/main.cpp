@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/04 20:04:21 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/11 19:36:09 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/16 20:14:48 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ int main(int argc, char **argv)
 		int port = parse_arguments(argv[1], argv[2]); 
 		
 		MiniServer server(port, argv[2]);
+		server.initServer();
+		server.runServer();
 		//las excepciones mejor solo para el parseo y algo minimo, no para el servidor
 	}
 	catch (const std::exception &e)
