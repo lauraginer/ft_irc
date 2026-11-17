@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/11 23:20:51 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/16 22:10:46 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/17 22:29:59 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,13 +81,13 @@ void MiniServer::acceptClient() //creamos el socket de cliente con accept()
 	
 	int clientFd = accept(serverFd, NULL, NULL); //aceptamos conexion con el cliente, pasamos NULL porque de momento no necesitamos la IP del cliente
 	if(clientFd == -1)
-		throw std::runtime_error("Error: The connection with client failed");
+		std::cerr << "Error: The connection with client failed" << std::endl;
 
 	//al hacer accept, la conexión sale de la cola y el bucle infinito de socket desaparece
-	if(fcntl(serverFd, F_SETFL, O_NONBLOCK) == -1) //pone el socket en modo no bloqueante (como dice el subject)
+	if(fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1) //pone el socket en modo no bloqueante (como dice el subject)
 	{
 		close(clientFd);
-		throw std::runtime_error("Error: non-blocking mode failed");
+		std::cerr << "Error: could not set client non-blocking" << std::endl;
 	}
 	
 	struct pollfd clientPoll; //creamos de nuevo la estructura para que poll la pueda manejar
