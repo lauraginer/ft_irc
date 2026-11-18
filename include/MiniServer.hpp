@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/11 23:20:59 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/16 21:27:28 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/18 19:53:22 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class MiniServer{
 		void initServer();
 		void runServer();
 		void acceptClient();
+		bool readClient(size_t index);
 		~MiniServer();
 };
 

@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/11 23:20:51 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/17 22:29:59 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/18 20:56:06 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,10 +65,9 @@ void MiniServer::runServer()
 			if(pollFds[i].revents & POLLIN) //compruebas el bit de POLLIN si esta activado
 			{
 				if(pollFds[i].fd == serverFd)
-					acceptClient(); //AQUI iria accept
-				else
-					std::cout << "Client fd " << pollFds[i].fd << " sent data" << std::endl;
-
+					acceptClient(); //accept
+				else if(readClient(i)) //recv
+					continue;
 			}
 			i++;
 		}
@@ -98,6 +97,25 @@ void MiniServer::acceptClient() //creamos el socket de cliente con accept()
 	pollFds.push_back(clientPoll);
 	
 	std::cout << "New client connected: fd " << clientFd << std::endl;
+}
+
+bool MiniServer::readClient(size_t index)
+{
+	std::cout << "Handling data from client..." << std::endl;
+	char buffer[512];
+	int fd = pollFds[index].fd; //guardamos el fd, ya que despues de erase el fd no existe y puede crashear
+
+	ssize_t bytes = recv(fd, buffer, sizeof(buffer) - 1, 0); // -1 para el char nulo
+	if(bytes <= 0)
+	{
+		std::cout << "Client fd" << fd << " disconnected" << std::endl;
+		close(fd);
+		pollFds.erase(pollFds.begin() + index);
+		return(true);
+	}
+	buffer[bytes] = '\0'; //añadimos el nulo, ya que recv lee bytes crudos
+	std::cout << "Received from fd " << fd << ": " << buffer;
+	return(false);
 }
 
 MiniServer::~MiniServer()
