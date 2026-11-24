@@ -6,18 +6,31 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/11 23:20:51 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/22 22:22:58 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/24 20:44:59 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "MiniServer.hpp"
+#include <csignal>
 
+volatile sig_atomic_t g_running = 1;
+
+void handleSignal(int)
+{
+	g_running = 0;
+}
 MiniServer::MiniServer(int pt, const std::string &pass): port(pt), password(pass), serverFd(-1){}
 
 MiniServer::~MiniServer()
 {
-	if(serverFd != -1)
-		close(serverFd);
+	size_t i = 0;
+	while(i < pollFds.size())
+	{
+		close(pollFds[i].fd);
+		i++;
+	}
+	pollFds.clear(); //clear es un metodo de varios contenedores que elimina todos los elementos y lo deja vacio, esto es opcional
+	clients.clear();
 }
 
 void MiniServer::initServer()
@@ -59,11 +72,15 @@ void MiniServer::initServer()
 
 void MiniServer::runServer()
 {
-	while(true)
+	while(g_running)
 	{
 		int ready = poll(&pollFds[0], pollFds.size(), -1); //llamada al so, el programa aparece dormido hasta que ocurra algo en los fds
 		if(ready == -1) //ready es el numero de elementos de la lista con revents
+		{
+			if(!g_running)
+				break; //para distinguir de un error comun
 			throw std::runtime_error("poll failed");
+		}
 		std::cout << "poll woke up, " << ready << " fds active" << std::endl;
 
 		//monitoreo de la actividad

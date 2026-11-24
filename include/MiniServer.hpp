@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/11 23:20:59 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/22 20:21:31 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/24 19:36:43 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,12 @@
 #include <signal.h>
 #include <vector>
 #include <map>
+#include <csignal>
 
 #include "Client.hpp"
+
+extern volatile sig_atomic_t g_running;
+void handleSignal(int);
 
 class MiniServer{
 

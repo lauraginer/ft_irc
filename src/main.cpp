@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/04 20:04:21 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/16 20:14:48 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/24 20:53:43 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 int parse_arguments(std::string port, std::string password)
 {	
 	if(port.empty() && password.empty())
-		throw std::runtime_error("wrong arguments. Usage: ./ircserver_bonus <port> <password>");
+		throw std::runtime_error("wrong arguments. Usage: ./ircserver <port> <password>");
 	//validacion del puerto
 	int number;
 	if(port.empty() || port.size() > 5)
@@ -50,13 +50,17 @@ int main(int argc, char **argv)
 	try
 	{
 		if(argc != 3)
-			throw std::runtime_error("wrong arguments. Usage: ./ircserver_bonus <port> <password>");
+			throw std::runtime_error("wrong arguments. Usage: ./ircserver <port> <password>");
 		int port = parse_arguments(argv[1], argv[2]); 
+		
+		signal(SIGINT, handleSignal); //Ctrl+C
+		signal(SIGQUIT, handleSignal); //Ctrl+"\"" 
+		signal(SIGPIPE, SIG_IGN);  //asi send() a un cliente cerrado no mata el programa entero
 		
 		MiniServer server(port, argv[2]);
 		server.initServer();
 		server.runServer();
-		//las excepciones mejor solo para el parseo y algo minimo, no para el servidor
+		//las excepciones mejor solo para el parseo y errores fatales, no para el servidor completo
 	}
 	catch (const std::exception &e)
 	{
