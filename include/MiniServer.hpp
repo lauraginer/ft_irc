@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/11 23:20:59 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/24 19:36:43 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/26 20:56:00 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,10 @@ class MiniServer{
 		void runServer();
 		void acceptClient();
 		bool readClient(size_t index);
+		void sendTo(int fd, const std::string &msg);
+		bool writeClient(size_t index);
+		void removeClient(size_t index);
+
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/22 18:24:12 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/24 21:16:16 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/26 20:56:19 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,13 @@ class Client{
 		~Client();
 
 		int getFd() const;
-		void appendToBuffer(const char *data, size_t len); 
+		void appendToInput(const char *data, size_t len); 
 		bool extractLine(std::string &line);
+		void appendToOutput(const std::string &msg);
+		bool hasOutput() const;
+		const std::string &getOutputBuffer() const;
+		void removeOutputBuffer(size_t n);
+		
 };
 
 #endif

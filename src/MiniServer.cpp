@@ -6,7 +6,7 @@
 /*   By: lauragm <lauragm@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/11/11 23:20:51 by lauragm           #+#    #+#             */
-/*   Updated: 2026/11/24 20:44:59 by lauragm          ###   ########.fr       */
+/*   Updated: 2026/11/26 21:28:20 by lauragm          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,12 +87,22 @@ void MiniServer::runServer()
 		size_t i = 0;
 		while(i < pollFds.size()) //para comprobar cuales son los fds activos
 		{
-			if(pollFds[i].revents & POLLIN) //compruebas el bit de POLLIN si esta activado
+			if(pollFds[i].fd == serverFd) 
 			{
-				if(pollFds[i].fd == serverFd)
+				if(pollFds[i].revents & POLLIN) //compruebas el bit de POLLIN si esta activado
 					acceptClient(); //accept
-				else if(readClient(i)) //recv
+			}
+			else
+			{
+				if(pollFds[i].revents & (POLLERR | POLLHUP | POLLNVAL)) //desconexión o error
+				{
+					removeClient(i);
 					continue;
+				}
+				if((pollFds[i].revents & POLLIN) && readClient(i)) //mientras haya datos que leer 
+					continue; //recv
+				if((pollFds[i].revents & POLLOUT) && writeClient(i)) //escribe sin bloquear
+					continue; //send
 			}
 			i++;
 		}
@@ -134,23 +144,63 @@ bool MiniServer::readClient(size_t index)
 	ssize_t bytes = recv(fd, buffer, sizeof(buffer) - 1, 0); // -1 para el char nulo
 	if(bytes <= 0) //si es -1 es error, si es 0 es desconectado, pero lo trartamos asi por obligacion del subject (prohibido consultar errno tras recv)
 	{
-		std::cout << "Client fd" << fd << " disconnected" << std::endl;
-		close(fd);
-		clients.erase(fd); //sincronizamos el mapa también
-		pollFds.erase(pollFds.begin() + index);
+		removeClient(index);
 		return(true);
 	}
-	/*buffer[bytes] = '\0'; //añadimos el nulo, ya que recv lee bytes crudos
-	std::cout << "Received from fd " << fd << ": " << buffer;*/
-
 	Client &client = clients[fd]; //el & es para modificar el cliente del mapa, no una copia
-	client.appendToBuffer(buffer, bytes);
+	client.appendToInput(buffer, bytes);
 	
 	std::string line;
 	while(client.extractLine(line))
-		std::cout << "Received from fd " << fd << ": [" << line << "]" << std::endl;
-
+	{
+		//std::cout << "Received from fd " << fd << ": [" << line << "]" << std::endl;
+		sendTo(fd, line + "\r\n");
+	}
 	return(false);
+}
+
+void MiniServer::sendTo(int fd, const std::string &msg)  //envia el mensaje al buffer de salida y espera a POLLOUT
+{
+	clients[fd].appendToOutput(msg);
+	
+	size_t i = 0;
+	while(i < pollFds.size())
+	{
+		if(pollFds[i].fd == fd)
+		{
+			pollFds[i].events |= POLLOUT; //avisame cuando pueda escribir en este fd
+			break;
+		}
+		i++;
+	}
+}
+
+bool MiniServer::writeClient(size_t index)
+{
+	int fd = pollFds[index].fd;
+	Client &client = clients[fd];
+	
+	const std::string &out = client.getOutputBuffer();
+	ssize_t sent = send(fd, out.c_str(), out.size(), 0);
+	if(sent <= 0) //si falla, eliminamos y devuelve true para que pare el bucle
+	{
+		removeClient(index);
+		return(true);
+	}
+	client.removeOutputBuffer(sent);
+	if(!client.hasOutput())
+		pollFds[index].events &= ~POLLOUT; //si ya no queda nada pendiente, deja de pedir POLLOUT
+	
+	return(false); //el cliente sigue activo
+}
+
+void MiniServer::removeClient(size_t index)
+{
+	int fd = pollFds[index].fd;
+	std::cout << "Client fd " << fd << " disconnected" << std::endl;
+	close(fd);
+	clients.erase(fd); //sincronizamos el mapa también
+	pollFds.erase(pollFds.begin() + index);
 }
 
 //Como el protocolo de IRC necesita líneas completas terminadas en \n o \r, debemos de crear un buffer por cliente
